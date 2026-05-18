@@ -27,14 +27,13 @@ Use the findings from $ARGUMENTS (or the file path provided) plus any live data 
 ---
 
 **TL;DR**
-Three sentences. Business outcomes first. What happened, what it means, what's next. No throat-clearing.
-One idea per sentence — if a sentence exceeds 20 words, split it.
+Three sentences maximum. Business outcomes first. One idea per sentence — no conjunctions (and, but, while, so) connecting two clauses. If a sentence exceeds 18 words, split it. No throat-clearing.
 
 **What changed this month**
 Bullet points. Concrete changes only — new skills deployed, teams onboarded, workflows standardized. If nothing changed, say so.
 
 **What's working**
-Two to four sentences. Lead with the strongest signal. Include the quantified proof point here if you have one ("X tool calls logged, Y% success rate"). One concrete example of an engineer workflow that improved.
+Three sentences maximum. Sentence 1: the quantified proof point ("X tool calls, Y% success rate"). Sentence 2: the single strongest signal — one engineer, one workflow, one outcome. Sentence 3: why it matters for the rest of the team. Stop there.
 
 **What's blocked**
 Bullet points. Each blocker should name: what it is, which team or system it affects, and how long it has been stuck. Include intervention signals surfaced by pattern-harvester if provided. If logging is inactive, flag it here.

@@ -63,4 +63,4 @@ Brief list of behaviors that indicate engineers are misusing the tool or fightin
 - Be direct. This output goes to someone making resourcing and prioritization decisions. No hedging, no padding.
 - If the data is thin (fewer than 3 files, fewer than 10 tool calls), say so clearly and note what additional data would make the analysis more reliable.
 - Do not invent patterns not supported by the files you read. Cite the file or row that supports each finding.
-- Deliver the analysis and stop. Do not ask follow-up questions or offer next steps.
+- Deliver the analysis and stop. Do not ask follow-up questions, offer next steps, suggest running other skills, or propose what to do with the findings. The output ends after Anti-Patterns.

@@ -145,20 +145,24 @@ printf '%s\n' "$findings"
 
 header "STEP 3 — Drafting exec readout (with live CSV stats)"
 
+# Inject CSV stats directly so the readout always has real numbers,
+# regardless of whether the skill can access CLAUDE_PLUGIN_DATA in this mode.
 claude --plugin-dir "$PLUGIN_DIR" -p \
   "/adoption-os:write-exec-readout
 Findings from pattern-harvester (2 weeks, 6 engineers — alice, bob, carol, david, eve, frank):
 
 $findings
 
-Live session log stats: $total tool calls logged across 6 engineers over 2 weeks.
-Overall success rate: ${success_pct}%. Most-used tool: ${top_tool}. Highest failure rate by tool: ${worst_tool}.
-david (backend): 8/8 success rate — clean grep-first-then-edit workflow every time.
-frank (frontend): 1/8 success rate, 3 abandoned tasks — missing mental model of interface propagation.
-carol (infra): 2 failed kubectl applies with no dry-run step before push.
-bob (backend): 5 failed git rebase attempts across 2 weeks, no diagnosis between retries.
-3 teams fully onboarded this month (frontend, backend, data).
-No shared skills or agents deployed yet — all standardization still manual."
+VERIFIED LIVE STATS FROM SESSION LOG (do not attempt to re-read the CSV — use these numbers directly):
+- Total tool calls logged: $total
+- Successes: $successes | Failures: $failures | Success rate: ${success_pct}%
+- Most-used tool: ${top_tool} | Highest-failure tool: ${worst_tool}
+- david (backend): 8/8 success — look-before-you-edit workflow, zero failures
+- frank (frontend): 1/8 success, 3 abandoned tasks — interface propagation blind spot
+- carol (infra): 2 failed kubectl applies in 2 weeks, no dry-run before either push
+- bob (backend): 5 failed git rebase attempts across 2 weeks, no diagnosis between retries
+- 3 teams onboarded this month (frontend, backend, data)
+- No shared skills or agents deployed yet — all consistency still manual"
 
 divider
 printf "  Demo complete.\n"

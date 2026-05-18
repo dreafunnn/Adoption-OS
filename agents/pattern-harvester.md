@@ -21,6 +21,16 @@ The user will invoke you with a directory path as the argument. That directory c
 
 Use Glob to discover all readable files in the directory, then Read each one. Use Grep to find recurring strings, command patterns, or error messages across files.
 
+Supported input formats:
+- `.jsonl` — actual Claude Code session transcripts stored at
+  `~/.claude/projects/<url-encoded-cwd>/<session-uuid>.jsonl`. One JSON
+  event per line. Relevant types: `tool_use` (fields: `name`, `input`),
+  `tool_result` (fields: `is_error`). Use Grep to extract tool calls:
+  `grep '"type":"tool_use"'` and `grep '"is_error":true'` are your
+  fastest signal extraction paths across large files.
+- `.md` or `.txt` — human-readable session logs with tool call summaries
+- `.csv` — usage exports with columns like timestamp, user, tool, file, success
+
 ## What to produce
 
 ### Section 1: Workflow Candidates
@@ -53,3 +63,4 @@ Brief list of behaviors that indicate engineers are misusing the tool or fightin
 - Be direct. This output goes to someone making resourcing and prioritization decisions. No hedging, no padding.
 - If the data is thin (fewer than 3 files, fewer than 10 tool calls), say so clearly and note what additional data would make the analysis more reliable.
 - Do not invent patterns not supported by the files you read. Cite the file or row that supports each finding.
+- Deliver the analysis and stop. Do not ask follow-up questions or offer next steps.

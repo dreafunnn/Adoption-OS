@@ -24,6 +24,7 @@ tool="$(printf '%s' "$payload" | jq -r '.tool // "unknown"')"
 target="$(printf '%s' "$payload" | jq -r '(.tool_input.file_path // .tool_input.command // "unknown")')"
 success="$(printf '%s' "$payload" | jq -r '(.tool_response // {} | has("error") | not)')"
 timestamp="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+user="${USER:-unknown}"
 
 # CSV formula injection guard: leading =, +, -, @ trick spreadsheet apps.
 sanitize_csv() {
@@ -45,15 +46,16 @@ csv_file="$csv_dir/adoption-os.csv"
 
 # Create with header if it doesn't exist yet.
 if [ ! -f "$csv_file" ]; then
-  printf 'timestamp,tool,target,success\n' > "$csv_file"
+  printf 'timestamp,user,tool,target,success\n' > "$csv_file"
 fi
 
 # Escape inner double quotes per RFC 4180 before wrapping field in double quotes.
 target_escaped="${target_safe//\"/\"\"}"
 
 # Append row.
-printf '%s,%s,"%s",%s\n' \
+printf '%s,%s,%s,"%s",%s\n' \
   "$timestamp" \
+  "$user" \
   "$tool_safe" \
   "$target_escaped" \
   "$success_safe" >> "$csv_file"

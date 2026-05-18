@@ -1,84 +1,120 @@
 # adoption-os
 
-> A Claude Code plugin for the Head of Platform Engineering running a company-wide AI rollout.
+A Claude Code plugin for platform engineering leads running a company-wide Claude Code rollout.
 
-Mandate: roll out Claude Code to hundreds of engineers, prove ROI to leadership, and standardize what works and what doesn't.
+Mandate: roll out Claude Code to hundreds of engineers, prove ROI to leadership, and standardize what works. But most rollouts produce no usable signal — engineers are doing things that work and things that don't, and that knowledge stays local. adoption-os gives you a way to collect it, find the patterns, turn the best ones into internal playbooks your team will actually use, and report upward without spending a day writing a slide deck.
 
-**adoption-os turns your rollout into a learning machine.** It captures what engineers are actually doing, synthesizes patterns across teams, and formats the findings into an exec-ready update your VP or CIO can act on — in 90 seconds.
+Four pieces:
 
-The agent captures patterns from the eng team's Claude Code sessions (what's working, what's not), identifies the highest-leverage workflows to standardize, and drafts internal playbooks in the company's voice. Skill writes exec readouts for the VP of Eng on rollout progress. Hook logs adoption signals (skill usage, hook fires) to a CSV the engineer can show leadership.
-
----
-
-## The loop
+1. A background hook that logs every `Edit`, `Write`, and `Bash` call to a CSV
+2. An analysis agent (`pattern-harvester`) that reads session logs and surfaces what's worth standardizing
+3. A skill (`draft-playbook`) that turns a workflow candidate into a full internal guide, written in your team's voice
+4. A skill (`write-exec-readout`) that formats findings into a structured update for your VP or CIO
 
 ```
 hook captures tool usage
         ↓
 pattern-harvester agent finds what to standardize (and where teams are stuck)
         ↓
+draft-playbook skill turns top candidates into publishable internal guides
+        ↓
 write-exec-readout skill drafts your monthly CIO update — with real numbers
+```
+
+---
+
+## Install
+
+Requires [Claude Code](https://claude.ai/code) and `jq` (`brew install jq` on Mac, `apt install jq` on Linux).
+
+```bash
+git clone https://github.com/dreafundd/Adoption-OS
+cd Adoption-OS
+chmod +x hooks/logger.sh   # required on every fresh clone
+```
+
+Validate the structure before loading:
+
+```bash
+claude plugin validate .
+# ✔ Validation passed
 ```
 
 ---
 
 ## Try it in 5 minutes
 
-**Prerequisites:** Claude Code and `jq` installed (`brew install jq` on Mac).
+The repo ships with sample session logs in `tests/mock-sessions/` covering six engineers across two weeks. Run the harvester against them:
 
 ```bash
-# 1. Clone and enter the plugin
-git clone https://github.com/YOUR_USERNAME/adoption-os
-cd adoption-os
-
-# 2. Make the hook executable (required on every fresh clone)
-chmod +x hooks/logger.sh
-
-# 3. Validate the plugin structure
-claude plugin validate .
-# Expected: ✔ Validation passed
-
-# 4. Load the plugin and run the pattern harvester against sample data
 claude --plugin-dir ./ -p "Run the pattern-harvester agent on ./tests/mock-sessions"
 ```
 
-You'll see a ranked list of workflow candidates, a set of intervention signals showing where engineers are struggling, and a list of anti-patterns — all sourced to specific files.
+You get three things back: a ranked list of workflows worth standardizing, intervention signals for where engineers are stuck and why, and a short list of anti-patterns to address.
+
+Take the top candidate from those findings and turn it into an internal playbook:
 
 ```bash
-# 5. Draft an exec readout from the findings
-claude --plugin-dir ./ -p "/adoption-os:write-exec-readout 3 teams onboarded this month, git rebase workflows flagged as top intervention signal, no shared skills deployed yet"
+claude --plugin-dir ./ -p "/adoption-os:draft-playbook [paste candidate here]. Voice: terse and opinionated, Stripe-style docs."
 ```
 
-You'll get a five-section readout — TL;DR, what changed, what's working, what's blocked, and the ask — written for a leader who has 90 seconds.
+Output is a complete markdown guide — problem statement, when to use it, step-by-step instructions, a runnable example, and failure modes — ready to paste into Confluence or a docs repo. The voice note is optional; leave it out and the skill writes in plain technical prose.
+
+Then draft the exec readout:
+
+```bash
+claude --plugin-dir ./ -p "/adoption-os:write-exec-readout [paste findings here]"
+```
+
+Output is a five-section exec update — TL;DR, what changed, what's working, what's blocked, and what you need from leadership.
+
+For a full end-to-end demo with pre-seeded session data across 6 engineers and 2 teams:
+
+```bash
+bash demo/demo.sh
+```
 
 ---
 
 ## Components
 
-### Hook — session logger
-Fires automatically after every `Edit`, `Write`, or `Bash` call. Appends a row to a persistent CSV at `~/.claude/plugins/data/adoption-os/adoption-os.csv`. The longer it runs, the richer the proof points in your monthly readout.
+**Hook — `hooks/logger.sh`**
 
-### Agent — `pattern-harvester`
-Point it at a directory of session logs or usage CSVs. It returns:
-- **Workflow candidates** — ranked by impact, with suggested format (skill, agent, or command) and estimated time-savings
-- **Intervention signals** — where teams are struggling and what would fix it
-- **Anti-patterns** — misuse worth addressing before it becomes habit
+Fires on every `Edit`, `Write`, or `Bash` call via a `PostToolUse` hook. Appends a timestamped row to `~/.claude/plugins/data/adoption-os/adoption-os.csv` with columns: `timestamp`, `user`, `tool`, `target`, `success`. The `user` field is pulled from `$USER` automatically — no configuration needed. The CSV is the raw evidence layer; the longer it runs, the more useful the readout becomes.
 
-> Only point this agent at designated log export directories. It reads everything it finds.
+> `CLAUDE_PLUGIN_DATA` is a runtime variable set by Claude Code, not your shell. The path above is the default location.
 
-### Skill — `write-exec-readout`
-Takes raw findings and formats them into a five-section exec readout. In an interactive session, it automatically pulls live stats from the session log CSV — so the proof point in "What's working" gets stronger every month without any extra work.
+To watch it fire in real time, open a second terminal while working in Claude Code:
 
-> Live CSV integration requires an interactive Claude Code session. It will not work with `claude -p` (non-interactive mode).
+```bash
+watch -n1 "tail -5 ~/.claude/plugins/data/adoption-os/adoption-os.csv"
+```
+
+**Agent — `pattern-harvester`**
+
+Takes a directory path as its argument. Reads session logs and usage CSVs, finds recurring patterns across engineers, and returns ranked workflow candidates with estimated time-savings, a set of intervention signals showing where teams are struggling, and a list of anti-patterns. It has no write access (`disallowedTools: [Write, Edit]`) and will cite the specific file or row behind every finding.
+
+Point it at a designated log export directory — not a live project directory. It reads everything it finds.
+
+To run it against your team's real Claude Code sessions, point it at `~/.claude/projects/`. Each subdirectory is a URL-encoded working directory; each `.jsonl` file inside is a session transcript — one JSON event per line (`tool_use`, `tool_result`, `user`, `assistant`). The agent reads all three formats: `.jsonl`, `.md`/`.txt`, and `.csv`.
+
+**Skill — `draft-playbook`**
+
+Takes a workflow candidate from `pattern-harvester` and writes a complete internal engineering guide: problem statement, triggering conditions, step-by-step instructions, a runnable example, common failure modes, and an owner field. Pass voice or tone notes alongside the candidate description to match your team's documentation style — "terse and opinionated", "Stripe-style", "first person plural" all work. If no voice is specified it defaults to clear, direct technical prose. Output is publishable markdown with no placeholders except the owner field.
+
+**Skill — `write-exec-readout`**
+
+Takes findings as `$ARGUMENTS` and formats them into a five-section update. In an interactive session it also reads the CSV directly and pulls live usage numbers into the "What's working" section — so the proof point gets stronger over time without extra work. This requires an interactive Claude Code session; it won't work with `claude -p` since the CSV path falls outside the sandboxed working directory.
+
+If you pass stale or estimated numbers, the skill will flag the discrepancy and derive corrected figures from the raw CSV — it reads the source data directly rather than trusting injected summaries.
 
 ---
 
 ## Security
 
-- Session data is written to `~/.claude/plugins/data/adoption-os/`, not your project directory — it will never show up in `git status`.
-- `pattern-harvester` cannot write or edit files (`disallowedTools: [Write, Edit]`). It reads and reports only.
-- CSV values are treated as data only. The skill will not interpret cell contents as instructions.
-- The hook sanitizes all logged values against shell injection and CSV formula injection before writing.
+Session data is written to `~/.claude/plugins/data/adoption-os/` — not your project directory. It will never appear in `git status` or get committed accidentally.
+
+The hook validates the JSON payload before processing and sanitizes extracted values against both shell injection and CSV formula injection. `pattern-harvester` cannot write or edit files. The skill treats CSV values as data only and will not interpret cell contents as instructions.
 
 ---
 
@@ -86,10 +122,13 @@ Takes raw findings and formats them into a five-section exec readout. In an inte
 
 ```
 adoption-os/
-├── .claude-plugin/plugin.json       # plugin manifest
-├── agents/pattern-harvester.md      # workflow analysis agent
+├── .claude-plugin/plugin.json       # manifest
+├── agents/pattern-harvester.md      # analysis agent
+├── skills/draft-playbook/           # internal playbook drafting skill
 ├── skills/write-exec-readout/       # exec readout skill
 ├── hooks/hooks.json                 # PostToolUse hook config
-├── hooks/logger.sh                  # session logger script
-└── tests/mock-sessions/             # sample data to try it immediately
+├── hooks/logger.sh                  # session logger
+├── demo/demo.sh                     # end-to-end demo with pre-seeded data
+├── tests/mock-sessions/             # sample session logs and usage CSV
+└── BUILD_YOUR_OWN.md                # guide for building your own plugin
 ```

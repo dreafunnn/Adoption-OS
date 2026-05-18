@@ -28,6 +28,7 @@ Use the findings from $ARGUMENTS (or the file path provided) plus any live data 
 
 **TL;DR**
 Three sentences. Business outcomes first. What happened, what it means, what's next. No throat-clearing.
+One idea per sentence — if a sentence exceeds 20 words, split it.
 
 **What changed this month**
 Bullet points. Concrete changes only — new skills deployed, teams onboarded, workflows standardized. If nothing changed, say so.

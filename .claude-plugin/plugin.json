@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.claude.ai/plugin/v1",
+  "name": "adoption-os",
+  "version": "0.1.0",
+  "description": "Adoption operating system for Claude Code rollouts",
+  "author": {
+    "name": "adoption-os"
+  },
+  "agents": ["./agents/pattern-harvester.md"],
+  "skills": ["./skills"],
+  "hooks": "./hooks/hooks.json"
+}

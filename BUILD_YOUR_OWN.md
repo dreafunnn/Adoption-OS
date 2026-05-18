@@ -60,8 +60,12 @@ Don't skip step 4. The hook is the easiest thing to get subtly wrong and the har
 Test each component in isolation before running the pipeline end-to-end:
 
 ```bash
-# Hook — pipe a mock payload directly, don't rely on a live session
-echo '{"tool":"Edit","tool_input":{"file_path":"src/app.ts"},"tool_response":{"content":"ok"}}' \
+# Hook — pipe a mock payload directly, don't rely on a live session.
+# The runtime sends tool_name (not tool), and Bash failures use isError not error.
+echo '{"tool_name":"Edit","tool_input":{"file_path":"src/app.ts"},"tool_response":{"content":"ok"}}' \
+  | bash hooks/your-script.sh
+# Bash failure shape — isError:true, not error:"..."
+echo '{"tool_name":"Bash","tool_input":{"command":"git rebase origin/main"},"tool_response":{"isError":true,"stdout":"","stderr":"CONFLICT"}}' \
   | bash hooks/your-script.sh
 
 # Agent — run against a small, controlled directory you created

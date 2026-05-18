@@ -20,9 +20,24 @@ if ! printf '%s' "$payload" | jq . >/dev/null 2>&1; then
 fi
 
 # Extract fields with jq. Use // fallbacks so missing keys never error.
-tool="$(printf '%s' "$payload" | jq -r '.tool // "unknown"')"
+# Runtime sends tool_name; fall back to .tool for compatibility with older payloads.
+tool="$(printf '%s' "$payload" | jq -r '.tool_name // .tool // "unknown"')"
 target="$(printf '%s' "$payload" | jq -r '(.tool_input.file_path // .tool_input.command // "unknown")')"
-success="$(printf '%s' "$payload" | jq -r '(.tool_response // {} | has("error") | not)')"
+
+# Success detection must cover all error shapes across tool types:
+#   .error        — Edit/Write failures
+#   .isError      — Bash failures (camelCase, most common)
+#   .is_error     — alternative snake_case
+#   stderr non-empty + stdout empty — Bash non-zero exit heuristic
+success="$(printf '%s' "$payload" | jq -r '
+  .tool_response // {} |
+  if .error != null then false
+  elif .isError == true then false
+  elif .is_error == true then false
+  elif ((.stderr // "" | length) > 0 and (.stdout // "" | length) == 0) then false
+  else true
+  end
+')"
 timestamp="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 user="${USER:-unknown}"
 

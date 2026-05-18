@@ -21,9 +21,23 @@ header()  { printf '\n'; divider; printf "  %s\n" "$1"; divider; }
 fire_hook() {
   local tool="$1" target_key="$2" target_val="$3" success="$4"
   local escaped="${target_val//\"/\\\"}"  # escape embedded double quotes for JSON
-  local response="{}"
-  [ "$success" = "false" ] && response='{"error":"non-zero exit"}'
-  printf '{"tool":"%s","tool_input":{"%s":"%s"},"tool_response":%s}' \
+  local response
+  if [ "$success" = "false" ]; then
+    # Use realistic error shapes: Bash uses isError+stderr, Edit/Write use is_error
+    if [ "$tool" = "Bash" ]; then
+      response='{"isError":true,"stdout":"","stderr":"non-zero exit code"}'
+    else
+      response='{"is_error":true,"content":"operation failed"}'
+    fi
+  else
+    if [ "$tool" = "Bash" ]; then
+      response='{"isError":false,"stdout":"ok","stderr":""}'
+    else
+      response='{"content":"ok"}'
+    fi
+  fi
+  # Use tool_name — the field name the Claude Code runtime actually sends
+  printf '{"tool_name":"%s","tool_input":{"%s":"%s"},"tool_response":%s}' \
     "$tool" "$target_key" "$escaped" "$response" \
     | bash "$PLUGIN_DIR/hooks/logger.sh"
 }

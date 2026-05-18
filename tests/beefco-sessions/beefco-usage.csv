@@ -1,0 +1,52 @@
+timestamp,user,tool,target,success
+2026-05-05T09:14:05Z,jhernandez,Read,src/main/java/com/beefco/supply/ReconciliationJob.java,true
+2026-05-05T09:14:20Z,jhernandez,Edit,src/main/java/com/beefco/supply/ReconciliationJob.java,true
+2026-05-05T09:14:30Z,jhernandez,Bash,./mvnw test -pl supply-chain -Dtest=ReconciliationJobTest,false
+2026-05-05T09:15:00Z,jhernandez,Bash,grep -r ShipmentBatch src/test --include=*.java -l,true
+2026-05-05T09:15:20Z,jhernandez,Edit,src/test/java/com/beefco/supply/InventoryReconciliationServiceTest.java,true
+2026-05-05T09:15:35Z,jhernandez,Edit,src/test/java/com/beefco/supply/BatchProcessorTest.java,true
+2026-05-05T09:15:45Z,jhernandez,Bash,./mvnw test -pl supply-chain -Dtest=ReconciliationJobTest,true
+2026-05-06T10:05:10Z,mchen,Read,models/marts/compliance/weekly_cattle_inventory.sql,true
+2026-05-06T10:05:20Z,mchen,Bash,dbt show --select weekly_cattle_inventory --limit 0,true
+2026-05-06T10:06:00Z,mchen,Edit,models/marts/compliance/weekly_cattle_inventory.sql,true
+2026-05-06T10:06:10Z,mchen,Bash,dbt run --select weekly_cattle_inventory --full-refresh,true
+2026-05-06T10:13:10Z,mchen,Bash,dbt test --select weekly_cattle_inventory,true
+2026-05-07T14:30:10Z,kokafor,Bash,terraform apply -target=module.cold_storage_eks.aws_eks_node_group.workers,false
+2026-05-07T14:30:40Z,kokafor,Bash,terraform apply -target=module.cold_storage_eks.aws_eks_node_group.workers,false
+2026-05-07T14:31:10Z,kokafor,Bash,terraform apply -target=module.cold_storage_eks.aws_eks_node_group.workers,false
+2026-05-07T14:31:50Z,kokafor,Bash,aws dynamodb get-item --table-name beefco-terraform-locks,true
+2026-05-07T14:32:15Z,kokafor,Bash,terraform force-unlock 8f3a2c1d,true
+2026-05-07T14:32:25Z,kokafor,Bash,terraform plan -target=module.cold_storage_eks.aws_eks_node_group.workers,true
+2026-05-07T14:33:00Z,kokafor,Bash,terraform apply -target=module.cold_storage_eks.aws_eks_node_group.workers,true
+2026-05-08T11:20:15Z,apatel,Edit,src/components/pricing/BeefCutPricingCard.tsx,false
+2026-05-08T11:20:30Z,apatel,Edit,src/types/pricing.ts,false
+2026-05-08T11:20:50Z,apatel,Edit,src/types/pricing.ts,false
+2026-05-09T09:05:10Z,lwong,Bash,grep -r wholesale/orders src/routes --include=*.ts -l,true
+2026-05-09T09:05:15Z,lwong,Bash,grep -r UsdaGrade src --include=*.ts -l,true
+2026-05-09T09:05:20Z,lwong,Read,src/types/beef.ts,true
+2026-05-09T09:05:35Z,lwong,Edit,src/routes/wholesale/orders.ts,true
+2026-05-09T09:05:45Z,lwong,Bash,npm test -- --testPathPattern=wholesale/orders,true
+2026-05-09T09:06:15Z,lwong,Bash,git diff --stat,true
+2026-05-12T10:15:00Z,jhernandez,Read,src/main/java/com/beefco/supply/ShipmentBatch.java,true
+2026-05-12T10:15:30Z,jhernandez,Edit,src/main/java/com/beefco/supply/ShipmentBatch.java,true
+2026-05-12T10:15:45Z,jhernandez,Bash,./mvnw test -pl supply-chain -Dtest=ShipmentBatchTest,false
+2026-05-12T10:16:00Z,jhernandez,Bash,grep -r ShipmentBatch src/main --include=*.java -l,true
+2026-05-12T10:16:30Z,jhernandez,Edit,src/main/java/com/beefco/supply/BatchProcessor.java,true
+2026-05-12T10:16:45Z,jhernandez,Bash,./mvnw test -pl supply-chain -Dtest=ShipmentBatchTest,true
+2026-05-13T14:00:00Z,kokafor,Bash,terraform apply -target=module.processing_eks,false
+2026-05-13T14:00:30Z,kokafor,Bash,terraform apply -target=module.processing_eks,false
+2026-05-13T14:01:00Z,kokafor,Bash,aws dynamodb get-item --table-name beefco-terraform-locks,true
+2026-05-13T14:01:20Z,kokafor,Bash,terraform force-unlock,true
+2026-05-13T14:01:30Z,kokafor,Bash,terraform plan -target=module.processing_eks,true
+2026-05-13T14:02:00Z,kokafor,Bash,terraform apply -target=module.processing_eks,true
+2026-05-14T09:30:00Z,mchen,Read,models/marts/compliance/daily_usda_inspection.sql,true
+2026-05-14T09:30:20Z,mchen,Bash,dbt show --select daily_usda_inspection --limit 0,true
+2026-05-14T09:31:00Z,mchen,Edit,models/marts/compliance/daily_usda_inspection.sql,true
+2026-05-14T09:31:15Z,mchen,Bash,dbt run --select daily_usda_inspection,true
+2026-05-14T09:35:00Z,mchen,Bash,dbt test --select daily_usda_inspection,true
+2026-05-15T11:00:00Z,apatel,Edit,src/components/pricing/BeefCutPricingCard.tsx,false
+2026-05-15T11:00:30Z,apatel,Edit,src/types/pricing.ts,false
+2026-05-15T11:01:00Z,apatel,Edit,src/types/pricing.ts,false
+2026-05-15T11:01:30Z,apatel,Edit,src/components/pricing/PricingDashboard.tsx,true
+2026-05-15T11:02:00Z,apatel,Edit,src/components/pricing/PricingTable.tsx,true
+2026-05-15T11:02:30Z,apatel,Bash,npm test -- --testPathPattern=pricing,true

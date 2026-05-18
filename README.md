@@ -2,9 +2,11 @@
 
 > A Claude Code plugin for the Head of Platform Engineering running a company-wide AI rollout.
 
-You got the mandate: roll out Claude Code to hundreds of engineers, prove ROI to leadership, and standardize what actually works. But adoption signals are scattered, wins are anecdotal, and when the CIO asks "how's it going?" the honest answer is "we think well."
+Mandate: roll out Claude Code to hundreds of engineers, prove ROI to leadership, and standardize what works and what doesn't.
 
 **adoption-os turns your rollout into a learning machine.** It captures what engineers are actually doing, synthesizes patterns across teams, and formats the findings into an exec-ready update your VP or CIO can act on — in 90 seconds.
+
+The agent captures patterns from the eng team's Claude Code sessions (what's working, what's not), identifies the highest-leverage workflows to standardize, and drafts internal playbooks in the company's voice. Skill writes exec readouts for the VP of Eng on rollout progress. Hook logs adoption signals (skill usage, hook fires) to a CSV the engineer can show leadership.
 
 ---
 
@@ -17,8 +19,6 @@ pattern-harvester agent finds what to standardize (and where teams are stuck)
         ↓
 write-exec-readout skill drafts your monthly CIO update — with real numbers
 ```
-
-Three components. One pipeline. You go from "we think it's going well" to "here's what the data shows, here's where we need help, and here's the ask."
 
 ---
 

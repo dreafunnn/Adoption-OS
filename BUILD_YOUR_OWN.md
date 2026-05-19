@@ -1,10 +1,12 @@
 # Build Your Own Claude Code Plugin
 
-A guide for engineers who want to build a plugin for their org — not a tutorial, not a spec dump. This is what you actually need to know before you start.
+A guide to build plugins.
 
 ---
 
 ## Start with the problem, not the code
+
+Before writing code, pick one painful, repeatable workflow and define the user. 
 
 Before you open the spec, answer these three questions in writing:
 
@@ -12,7 +14,31 @@ Before you open the spec, answer these three questions in writing:
 2. **What decision or task does it enable that they can't do cleanly today?**
 3. **What would they see or get if it worked perfectly?**
 
-If you can't answer all three in two sentences each, you're not ready to build. The most common failure mode is building something technically correct that nobody uses because the use case was fuzzy from the start.
+A strong plugin starts with a sentence like:
+
+“This plugin helps a [specific persona] do [specific job] faster, more consistently, or with better evidence.”
+
+**Once you have this statement, you have your prompt to put into Claude Code. **
+
+---
+
+## Add a skill that teaches the agent how to behave
+
+4. Add a skill that teaches the agent how to behave
+A skill gives the agent repeatable judgment. It is where you encode the team’s standards, rules, and preferred way of working.
+The skill might define:
+How to classify severity
+How to write a good incident summary
+How to evaluate whether a Terraform module is compliant
+How to identify an adoption blocker
+How to format a leadership-ready recommendation
+Example:
+The “CVE Triage Skill” teaches the agent how to evaluate vulnerability severity using exploitability, affected service criticality, exposure, package usage, and available remediation paths.
+The skill is what turns the plugin from a generic AI helper into something that reflects how your organization works.
+
+
+
+
 
 ---
 
@@ -26,7 +52,7 @@ The official spec lives at `https://code.claude.com/docs/en/plugins`. Read it be
 - What `${CLAUDE_PLUGIN_ROOT}` and `${CLAUDE_PLUGIN_DATA}` are and when each one applies
 - What the hook payload actually looks like on stdin — you can't write a hook script without knowing the shape of the input
 
-Thirty minutes here saves hours of debugging later. If you skip this and let Claude interpret the spec for you, you'll approve fixes you don't understand and end up owning something you can't maintain.
+If you skip this and let Claude interpret the spec for you, you'll approve fixes you don't understand and end up owning something you can't maintain.
 
 ---
 
@@ -41,11 +67,11 @@ Thirty minutes here saves hours of debugging later. If you skip this and let Cla
 5. Write agent and skill content only after the structure is clean
 6. Run `claude --plugin-dir ./` and test each component independently before chaining them
 
-Don't skip step 4. The hook is the easiest thing to get subtly wrong and the hardest to debug once it's buried in a live session.
+Don't skip step 4. The hook is the easiest thing to get wrong and the hardest to debug once it's buried in a live session.
 
 ---
 
-## Three things that will bite you
+## Three things to be hyper aware of
 
 **1. Hook scripts must be executable.** `chmod +x hooks/your-script.sh` on every fresh clone. Put this in your install steps or it will silently not fire.
 

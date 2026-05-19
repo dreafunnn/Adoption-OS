@@ -1,15 +1,12 @@
 # Build Your Own Claude Code Plugin
 
-**Audience:** Engineers building a plugin for a repeatable workflow inside their organization  
 **Reference build:** [`adoption-os`](https://github.com/dreafunnn/Adoption-OS/tree/main)
 
-You’ve seen `adoption-os` turn Claude Code usage into patterns, playbooks, and exec readouts. This guide shows you how to build the same kind of operating loop for your own workflow: observe the right signal, choose the right component, produce a useful artifact, and verify it works from a fresh clone.
-
-A good plugin is not a pile of Claude Code features. It is a repeatable operating loop that turns messy engineering work into a reliable artifact.
+You’ve seen `adoption-os` turn Claude Code usage into new workflows, playbooks, and an exec readout. This guide shows you how to build the same kind of operating loop for your own workflow: observe the right signal, choose the right component, produce a useful artifact, and verify it works from a fresh clone.
 
 ---
 
-## The Adoption OS Pattern
+## Reviewing the Adoption OS Pattern
 
 `adoption-os` works because it follows a simple architecture:
 
@@ -32,9 +29,9 @@ Do not start with files. Start with the loop.
 
 ## 1. Define the Problem
 
-Build a plugin when a workflow is **repeated**, has a **right way to do it**, and today lives in someone’s head.
+Build a plugin when a workflow is **repeated**, has a **right way to do it**, and is a persistent problem or manual effort.
 
-Finish this sentence before you build anything:
+To start, define the role of the user and the issue they have. Here is a template you can use:
 
 ```text
 Every time someone [does X], they should [do Y],
@@ -139,7 +136,7 @@ A useful `SKILL.md` should include:
 description: Scaffold a microservice to company standards.
 ---
 
-Given a service name, create the five standard files:
+Given a service name, create the standard files:
 
 1. `ci.yml`
 2. `Dockerfile`
@@ -216,8 +213,6 @@ How each component works
 Security notes
 Troubleshooting
 ```
-
-If the README is incomplete, the plugin is not done.
 
 ---
 
@@ -323,5 +318,3 @@ Before sharing, make sure:
 [ ] The README explains how to adapt the pattern
 [ ] Security assumptions are explicit
 ```
-
-Your reference build is `adoption-os`. Every pattern here — manifest, skill, agent, hook, demo, README — should map back to that repo. If you are stuck, copy the shape, swap the workflow, and keep the operating loop.

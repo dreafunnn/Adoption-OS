@@ -2,7 +2,7 @@
 
 A Claude Code plugin for platform engineering leads running a company-wide Claude Code rollout.
 
-Mandate: roll out Claude Code to hundreds of engineers, standardize what works, and prove ROI prove ROI to leadership. Most rollouts produce no usable signal — engineers are doing things that work and things that don't, and that knowledge stays local. adoption-os gives you a way to collect it, find the patterns, turn the best ones into internal playbooks that your team will actually use, and report upward without spending a day collecting notes and writing a slide deck.
+Mandate: roll out Claude Code to hundreds of engineers, standardize what works, and prove ROI to leadership. Most engineers are doing things that work and things that don't, and that knowledge stays local. adoption-os gives you a way to collect it, find the patterns, turn the best ones into internal playbooks that your team will actually use, and report upward without spending a day collecting notes and writing a slide deck.
 
 Four pieces:
 

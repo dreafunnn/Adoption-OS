@@ -150,7 +150,24 @@ header "STEP 2 — Running pattern-harvester against session logs"
 printf "  Analyzing: %s\n\n" "$SESSIONS_DIR"
 
 findings="$(claude --plugin-dir "$PLUGIN_DIR" -p \
-  "Run the pattern-harvester agent on $SESSIONS_DIR")"
+  "Run the pattern-harvester agent on $SESSIONS_DIR.
+
+Return the agent's output VERBATIM. Do not summarize it, do not condense it,
+do not extract highlights, do not add a closing 'want me to...' question.
+
+The agent emits three required sections, in this exact order, with these
+exact headers:
+  ### Workflow Candidates
+  ### Intervention Signals
+  ### Anti-Patterns
+
+Each Workflow Candidate must include all five fields: Pattern, Frequency,
+Time-savings if standardized, Suggested format, Rationale. Each Intervention
+Signal must include all four fields: Pattern observed (with citation), Who,
+Root cause, Intervention. Each Anti-Pattern must include the label, who/where
+with a citation, and the concrete risk.
+
+Print the agent's full structured output and stop.")"
 
 printf '%s\n' "$findings"
 

@@ -38,6 +38,48 @@ Supported input formats:
 
 ## What to produce
 
+Your output MUST contain all three sections below, in this exact order, with these exact headers. **Omitting a section, or compressing a whole section into a single sentence, is a failure mode.** Even when data is thin, every section header must appear, with either at least one fully-fielded entry or an explicit "No items; would need [X]" line.
+
+Use this literal output template — fill in the angle-bracketed slots, keep the headers and bullet structure exactly as shown:
+
+```
+## Pattern Harvester Findings
+
+Analyzed <N> sessions from <source paths or directories>.
+
+### Workflow Candidates
+
+1. **<Pattern label>** — <one concrete sentence describing what the engineer was doing>
+   - Frequency: <count or rate, e.g. "3 times across 2 engineers in 6 days">
+   - Time-savings if standardized: <~X min/instance, ~Y hrs/week across the team>
+   - Suggested format: <skill | agent | command — with one-line reason>
+   - Rationale: <why this is worth formalizing now>
+
+2. **<Next pattern>** — ...
+   (repeat for 3–7 candidates total)
+
+### Intervention Signals
+
+1. **<who> — <short pattern label>.** <Concrete observation with a file/session citation.>
+   - Who: <specific user(s) or team>
+   - Root cause: <hypothesis: missing knowledge, no guardrail, fixture debt, etc.>
+   - Intervention: <a specific skill, guide, pairing, or agent that would fix it>
+
+2. **<Next signal>** — ...
+   (repeat for every signal worth acting on)
+
+### Anti-Patterns
+
+1. **<Pattern label>** — <who exhibited it and where, with a file/session citation>. Risk: <the concrete cost or production risk this creates>.
+
+2. **<Next anti-pattern>** — ...
+   (repeat for every anti-pattern observed)
+```
+
+If a section truly has no items in the data, still write the header and one line: `_No clear examples in this data; would need <specific data type, e.g. more than one session per engineer> to evaluate._` Never silently drop a section.
+
+The sub-sections below describe *what makes each field good* — they do not relax the structural requirement above.
+
 ### Section 1: Workflow Candidates
 
 A ranked list of 3–7 workflow patterns worth formalizing. Rank by estimated impact (frequency × time-savings).

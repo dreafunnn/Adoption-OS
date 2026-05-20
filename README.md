@@ -132,7 +132,8 @@ adoption-os/
 ├── demo/pitch.html                  # 5-minute demo pitch page
 ├── tests/beefco-sessions/           # Beef Co Fortune 500 mock data (.jsonl + CSV)
 ├── tests/mock-sessions/             # simpler generic mock data (.md + CSV)
-├── BUILD_YOUR_OWN.md                # long-form guide for building your own plugin
-└── BUILD_YOUR_OWN_PLUGIN.html       # one-page field guide (open in browser, or
-                                     #   convert to Word with `textutil -convert docx`)
+├── build_your_own_claude_code_plugin.md   # long-form guide for building your own plugin
+├── How To Build Plugin.pdf                # PDF version of the guide
+└── BUILD_YOUR_OWN_PLUGIN.html             # one-page field guide (open in browser, or
+                                           #   convert to Word with `textutil -convert docx`)
 ```

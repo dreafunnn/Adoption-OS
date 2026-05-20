@@ -9,3 +9,10 @@ adoption-os.csv
 .idea/
 .vscode/
 *.swp
+
+# Microsoft Word lock files (created when a .docx is open)
+~$*
+
+# Generated Word doc — regenerated from the HTML via
+# `textutil -convert docx BUILD_YOUR_OWN_PLUGIN.html -output BUILD_YOUR_OWN_PLUGIN.docx`
+*.docx

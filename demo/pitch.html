@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adoption OS — 5-Minute Demo</title>
+  <style>
+    :root {
+      --bg:       #0d0d0f;
+      --surface:  #16161a;
+      --border:   #2a2a32;
+      --text:     #e8e8f0;
+      --muted:    #7a7a90;
+      --accent:   #7c6af7;
+      --accent2:  #4fc8a8;
+      --red:      #f06070;
+      --amber:    #f0a840;
+      --tag-bg:   #1e1e28;
+      --mono:     'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --sans:     'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Layout ── */
+    .wrapper {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 72px 24px 120px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      margin-bottom: 72px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 48px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 17px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .pill {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--tag-bg);
+    }
+
+    .pill.accent { border-color: var(--accent); color: var(--accent); }
+    .pill.green  { border-color: var(--accent2); color: var(--accent2); }
+
+    /* ── Section cards ── */
+    .section {
+      margin-bottom: 48px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 28px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      flex: 1;
+    }
+
+    .time-badge {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      background: rgba(124, 106, 247, 0.12);
+      border: 1px solid rgba(124, 106, 247, 0.25);
+      border-radius: 100px;
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+
+    .section-body {
+      padding: 28px;
+    }
+
+    /* ── Typography inside sections ── */
+    .section-body p {
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .section-body p:last-child { margin-bottom: 0; }
+
+    .section-body em {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .section-body strong {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* ── Stage blocks (for the demo section) ── */
+    .stage {
+      margin: 24px 0;
+      border-left: 2px solid var(--accent);
+      padding-left: 20px;
+    }
+    .stage:last-child { margin-bottom: 0; }
+
+    .stage-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .stage p {
+      font-size: 15px;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    /* ── Terminal block ── */
+    .terminal {
+      background: #0a0a0c;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 14px 0;
+      overflow-x: auto;
+    }
+
+    .terminal .prompt { color: var(--accent2); user-select: none; }
+    .terminal .cmd    { color: #fff; }
+    .terminal .out    { color: var(--muted); }
+    .terminal .ok     { color: var(--accent2); }
+    .terminal .err    { color: var(--red); }
+    .terminal .hi     { color: var(--amber); }
+
+    /* ── Finding cards (inside harvester output) ── */
+    .findings {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
+    .finding {
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .finding-icon {
+      font-size: 16px;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .finding-text {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .finding-text strong { color: #fff; }
+
+    .finding.warn  { border-color: rgba(240, 96, 112, 0.35); }
+    .finding.good  { border-color: rgba(79, 200, 168, 0.35); }
+
+    /* ── Two-col insight grid ── */
+    .insight-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    @media (max-width: 520px) {
+      .insight-grid { grid-template-columns: 1fr; }
+    }
+
+    .insight-card {
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .insight-card .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .insight-card .value {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .insight-card .desc {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .insight-card.accent-card { border-color: rgba(124, 106, 247, 0.4); }
+    .insight-card.green-card  { border-color: rgba(79, 200, 168, 0.4); }
+
+    /* ── Quote / callout ── */
+    .callout {
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      background: var(--tag-bg);
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 15px;
+      font-style: italic;
+      color: var(--muted);
+    }
+
+    .callout cite {
+      display: block;
+      margin-top: 8px;
+      font-size: 12px;
+      font-style: normal;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── Decision list ── */
+    .decision-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .decision-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .decision-list .bullet {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(124, 106, 247, 0.15);
+      border: 1px solid rgba(124, 106, 247, 0.4);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ── Steps ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(124, 106, 247, 0.1);
+      border: 1px solid rgba(124, 106, 247, 0.25);
+      border-radius: 6px;
+      padding: 4px 10px;
+      height: fit-content;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .step-content strong {
+      display: block;
+      color: #fff;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      font-size: 14px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    /* ── Divider ── */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 80px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-left {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer-left strong { color: var(--text); }
+
+    .gh-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      background: var(--surface);
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .gh-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── Exec readout preview ── */
+    .readout-preview {
+      background: var(--tag-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .readout-preview .ro-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .readout-preview .ro-tldr {
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .readout-preview .ro-section {
+      margin-bottom: 14px;
+    }
+
+    .readout-preview .ro-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .readout-preview ul {
+      padding-left: 16px;
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .readout-preview ul li { margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- ── Hero ── -->
+  <div class="hero">
+    <p class="eyebrow">Claude Code Plugin</p>
+    <h1>Adoption <span>OS</span></h1>
+    <p class="hero-sub">A platform engineering plugin that turns Claude Code session logs into standardized workflows, internal playbooks, and exec-ready readouts — automatically.</p>
+    <div class="pill-row">
+      <span class="pill accent">5-minute demo</span>
+      <span class="pill green">pattern-harvester agent</span>
+      <span class="pill">PostToolUse hook</span>
+      <span class="pill">2 skills</span>
+      <span class="pill">Fortune 500 scale</span>
+    </div>
+  </div>
+
+  <!-- ── Section 1 ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Who this is for and what problem it solves</span>
+      <span class="time-badge">0:00 – 0:30</span>
+    </div>
+    <div class="section-body">
+      <p>Start with the problem — because it's one almost every engineering leader at this table has right now.</p>
+
+      <div class="callout">
+        "I can tell the CIO we have 800 licenses. I cannot tell her what engineers are doing with them, which teams are struggling, or what the top 10% are doing differently."
+        <cite>— Head of Platform Engineering, Fortune 500</cite>
+      </div>
+
+      <p>You've rolled out Claude Code. Engineers are using it. But you have no idea if it's actually making them faster — or just faster at making mistakes. You can see seat counts. You cannot see workflows.</p>
+
+      <p><strong>Adoption OS closes that gap.</strong> It logs what Claude Code is actually doing, analyzes session transcripts to surface repeatable patterns, and formats the findings into something you can hand to a VP without editing it first.</p>
+    </div>
+  </div>
+
+  <!-- ── Section 2 ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Live demo of the plugin doing its thing</span>
+      <span class="time-badge">0:30 – 2:00</span>
+    </div>
+    <div class="section-body">
+
+      <p><em>Run <code style="font-family: var(--mono); font-size: 13px; color: var(--accent2); background: rgba(79,200,168,0.08); padding: 2px 6px; border-radius: 4px;">bash demo/demo.sh</code> — let it print, narrate over it.</em></p>
+
+      <div class="stage">
+        <p class="stage-label">Step 1 — The hook</p>
+        <p>Every time an engineer uses Claude Code to run a command, edit a file, or read code, a lightweight hook logs it: timestamp, engineer, tool, target, success or failure. No setup required on the engineer's end.</p>
+        <div class="terminal">
+          <div><span class="ok">✔</span> <span class="cmd">Beefco CSV seeded: 49 rows | 36 successes | 13 failures | 73% success rate</span></div>
+          <div class="out">Location: ~/.claude/plugins/data/adoption-os/adoption-os.csv</div>
+        </div>
+        <p>Right now we're simulating two weeks of activity across five engineers at Beef Co — supply chain, data platform, infrastructure, pricing, and wholesale.</p>
+      </div>
+
+      <div class="stage">
+        <p class="stage-label">Step 2 — The harvester</p>
+        <p>The pattern-harvester agent reads the raw session transcripts — not just the CSV, the actual <code style="font-family: var(--mono); font-size: 12px; color: var(--muted);">.jsonl</code> files Claude Code writes — and reasons across them.</p>
+
+        <div class="findings">
+          <div class="finding good">
+            <span class="finding-icon">✦</span>
+            <div class="finding-text"><strong>Two engineers — zero failures.</strong> lwong (wholesale API) and mchen (data platform) completed every task without an error, by reading code before changing it. Their sessions are a ready-made template.</div>
+          </div>
+          <div class="finding warn">
+            <span class="finding-icon">▲</span>
+            <div class="finding-text"><strong>Blind Terraform retries.</strong> kokafor ran the same failing <code style="font-family: var(--mono); font-size: 12px;">terraform apply</code> 5 times across two sessions — never read the error that already named the fix. Recurred the following week.</div>
+          </div>
+          <div class="finding warn">
+            <span class="finding-icon">▲</span>
+            <div class="finding-text"><strong>Broken branch, two weeks.</strong> apatel edited a shared component before checking what depended on it, hit cascading TypeScript errors, abandoned the task. Branch is still broken.</div>
+          </div>
+        </div>
+
+        <p>And it ranks the five workflows worth standardizing — ordered by how many engineers benefit and how much friction it removes.</p>
+      </div>
+
+      <div class="stage">
+        <p class="stage-label">Step 3 — The exec readout</p>
+        <p>This is what you'd actually send. TL;DR, what changed, what's working, what's blocked, three specific asks.</p>
+
+        <div class="readout-preview">
+          <div class="ro-label">VP / CIO Update — May 2026</div>
+          <div class="ro-tldr">Three engineering teams adopted AI-assisted workflows this month. Two engineers reached a perfect success rate by following a read-before-edit discipline. Spreading that discipline is the fastest lever to lift the team's 73% success rate.</div>
+          <div class="ro-section">
+            <div class="ro-section-title">What's blocked</div>
+            <ul>
+              <li>Pricing team: broken branch open 2 weeks — interface cascade from edit-before-read</li>
+              <li>Infra: 5 failed deployments across 2 sessions, same root cause each time</li>
+              <li>No standardized workflows deployed yet — consistency is still 100% manual</li>
+            </ul>
+          </div>
+          <div class="ro-section">
+            <div class="ro-section-title">The ask</div>
+            <ul>
+              <li>Approve read-before-edit as the platform-wide default — ready to ship now</li>
+              <li>Direct infra lead to rewrite deployment runbook before next release cycle</li>
+              <li>Endorse a broader usage pull before headcount decisions</li>
+            </ul>
+          </div>
+        </div>
+
+        <p>From raw session logs to VP-ready update in under 90 seconds.</p>
+      </div>
+
+      <div class="insight-grid">
+        <div class="insight-card accent-card">
+          <div class="label">Tool calls logged</div>
+          <div class="value">49</div>
+          <div class="desc">2 weeks · 5 engineers · 3 teams</div>
+        </div>
+        <div class="insight-card green-card">
+          <div class="label">Success rate</div>
+          <div class="value">73%</div>
+          <div class="desc">36 successes · 13 failures</div>
+        </div>
+        <div class="insight-card">
+          <div class="label">Zero-failure engineers</div>
+          <div class="value">2 / 5</div>
+          <div class="desc">lwong, mchen — read-before-edit pattern</div>
+        </div>
+        <div class="insight-card">
+          <div class="label">Patterns found</div>
+          <div class="value">5</div>
+          <div class="desc">ranked by frequency × time savings</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Section 3 ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">How it was built — the interesting decisions</span>
+      <span class="time-badge">2:00 – 3:30</span>
+    </div>
+    <div class="section-body">
+
+      <p>The plugin has four parts: a hook that logs tool events, a CSV for structured usage data, an agent that harvests patterns from session transcripts, and a skill that formats findings for executives.</p>
+
+      <p><strong>The decision I'm most glad I made:</strong> I built the hook before I built anything else, and had Claude Code write a test harness that fired fake tool events through it. That's what caught the two bugs that would have silently broken everything in production.</p>
+
+      <div class="findings">
+        <div class="finding warn">
+          <span class="finding-icon">🐛</span>
+          <div class="finding-text">
+            <strong>Bug 1 — Wrong field name.</strong> The Claude Code runtime sends <code style="font-family: var(--mono); font-size: 12px;">tool_name</code>, not <code style="font-family: var(--mono); font-size: 12px;">tool</code>. Using the wrong name logged every row as <code style="font-family: var(--mono); font-size: 12px;">unknown</code>. 800 engineers' worth of data that tells you nothing.
+          </div>
+        </div>
+        <div class="finding warn">
+          <span class="finding-icon">🐛</span>
+          <div class="finding-text">
+            <strong>Bug 2 — Four error shapes.</strong> Bash failures send <code style="font-family: var(--mono); font-size: 12px;">isError: true</code>. Edit failures send <code style="font-family: var(--mono); font-size: 12px;">is_error: true</code>. Different field, different casing. Success detection needed four cases or it marked every infra failure as success.
+          </div>
+        </div>
+      </div>
+
+      <p><strong>Where I had to steer Claude Code:</strong> The harvester kept ending every analysis with "Would you like me to draft a playbook?" That sounds helpful, but inside a demo it's noise — it breaks the flow and makes it look like the tool can't finish a task on its own.</p>
+
+      <p>I had to be explicit: <em>output ends after the anti-patterns section, do not offer next steps, do not ask follow-up questions.</em> That instruction is in the agent's system prompt now. Knowing when "helpfulness" is actually a bug — that's the job.</p>
+
+    </div>
+  </div>
+
+  <!-- ── Section 4 ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">Walking a customer through building their own</span>
+      <span class="time-badge">3:30 – 4:30</span>
+    </div>
+    <div class="section-body">
+
+      <p>The repo includes a guide called <strong>BUILD_YOUR_OWN.md</strong>. The pitch: if you can describe a repeated workflow in plain English, you can probably ship a plugin in an afternoon.</p>
+
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1 min</span>
+          <div class="step-content">
+            <strong>Name the workflow</strong>
+            <p>What's the one thing your best engineers do that your median engineers don't? Write it down. That's your agent prompt.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">5 min</span>
+          <div class="step-content">
+            <strong>Validate before you write logic</strong>
+            <p>Run <code style="font-family: var(--mono); font-size: 12px; color: var(--accent2);">claude plugin validate .</code> on the stub. Catch structural errors early. We found the <code style="font-family: var(--mono); font-size: 12px;">agents</code> field pointing to a directory instead of a file before any code existed.</p>
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">30 min</span>
+          <div class="step-content">
+            <strong>Write the hook test harness first</strong>
+            <p>Fire fake tool events through <code style="font-family: var(--mono); font-size: 12px; color: var(--accent2);">logger.sh</code> and confirm your CSV has real data. This is the step most people skip. It's the step that catches the bugs that would otherwise live in production for weeks.</p>
+          </div>
+        </div>
+      </div>
+
+      <p>The three things that are actually hard — and where I'd tell any customer to slow down:</p>
+
+      <ul class="decision-list">
+        <li>
+          <span class="bullet">1</span>
+          <span>The hook payload schema is underdocumented. <code style="font-family: var(--mono); font-size: 12px; color: var(--muted);">tool_name</code> vs <code style="font-family: var(--mono); font-size: 12px; color: var(--muted);">tool</code> will silently break your logging.</span>
+        </li>
+        <li>
+          <span class="bullet">2</span>
+          <span>Success detection has four shapes across tools. Get one wrong and your failure metrics are wrong.</span>
+        </li>
+        <li>
+          <span class="bullet">3</span>
+          <span>CSV formula injection is a real attack surface if engineers are running untrusted code.</span>
+        </li>
+      </ul>
+
+      <p>All three are handled in this repo. The guide explains <em>why</em>, not just what.</p>
+
+    </div>
+  </div>
+
+  <!-- ── Close ── -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Close</span>
+      <span class="time-badge">4:30 – 5:00</span>
+    </div>
+    <div class="section-body">
+      <p>The gap between <em>"we have Claude Code licenses"</em> and <em>"we know what Claude Code is doing for our engineers"</em> is a tool problem — and it's solvable.</p>
+      <p>This plugin is a proof of concept, but the architecture is real: hooks, structured logging, session analysis, exec reporting. Any platform team could own this in a week.</p>
+      <p><strong>The repo is public. The guide is there.</strong> And if you want to see what your own engineers' sessions look like run through this — that's a 20-minute setup.</p>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    <div class="footer-left">
+      <strong>adoption-os</strong> · Claude Code Plugin · v0.1.0<br>
+      <span>Built for platform engineering leads running company-wide rollouts</span>
+    </div>
+    <a class="gh-link" href="https://github.com/dreafunnn/Adoption-OS" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+          0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+          -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+          .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+          -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27
+          .68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12
+          .51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+          0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+      </svg>
+      View on GitHub
+    </a>
+  </div>
+
+</div>
+</body>
+</html>

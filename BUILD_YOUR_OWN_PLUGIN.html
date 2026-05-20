@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Building a Claude Code Plugin: Field Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f0f0f0;
+      font-size: 9pt;
+      color: #1a1a1a;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page {
+      width: 8.5in;
+      height: 11in;
+      overflow: hidden;
+      margin: 24px auto;
+      background: #fff;
+      padding: 0.5in 0.6in 0.42in;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .doc-header {
+      border-bottom: 2px solid #1a1a1a;
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      flex-shrink: 0;
+    }
+    .doc-title {
+      font-size: 16pt; font-weight: 700; letter-spacing: -0.02em;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .doc-title .meta { font-size: 7pt; font-weight: 600; color: #999; letter-spacing: 0.04em; }
+
+    /* ── Intro ── */
+    .intro {
+      font-size: 9pt; color: #444; line-height: 1.5;
+      background: #f6f5ff; border: 1px solid #d8d3f5;
+      border-left: 2.5px solid #6a5af0;
+      border-radius: 0 3px 3px 0;
+      padding: 8px 13px; margin-bottom: 7px; flex-shrink: 0;
+    }
+    .intro strong { color: #1a1a1a; font-weight: 600; }
+
+    /* ── Pattern line ── */
+    .pattern-line {
+      display: flex; align-items: center; gap: 9px;
+      background: #1c1c22; border-radius: 4px;
+      padding: 7px 13px; margin-bottom: 12px; flex-shrink: 0;
+      font-size: 8pt;
+    }
+    .pattern-line .pl-tag {
+      color: #b3a8ff; font-weight: 700; letter-spacing: 0.03em;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .pattern-line .pl-flow { color: #cfcfda; }
+    .pattern-line .pl-flow b { color: #6fd0aa; font-weight: 600; }
+    .pattern-line .pl-flow .ar { color: #6a6a80; padding: 0 2px; }
+
+    /* ── Columns ── */
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      gap: 0 22px;
+      flex: 1; min-height: 0;
+    }
+    .col-rule { background: #e8e8e8; }
+
+    /* ── Section ── */
+    section { margin-bottom: 14px; }
+    section:last-child { margin-bottom: 0; }
+
+    h2 {
+      font-size: 10.5pt; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 5px;
+      display: flex; align-items: center; gap: 9px;
+    }
+    h2 .n {
+      background: #6a5af0; color: #fff;
+      font-size: 8.5pt; font-weight: 700;
+      width: 20px; height: 20px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    p { font-size: 9pt; line-height: 1.5; margin-bottom: 3px; color: #2a2a2a; }
+    p:last-child { margin-bottom: 0; }
+    .micro { font-size: 8pt; color: #888; line-height: 1.45; }
+    .micro code { font-size: 7.5pt; }
+    .em { color: #6a5af0; font-weight: 600; }
+
+    /* ── Code ── */
+    code {
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 8pt;
+      background: #f3f3f3; border: 1px solid #e3e3e3;
+      border-radius: 3px; padding: 0 3px;
+    }
+    .code-block {
+      background: #1c1c22; border-radius: 4px;
+      padding: 6px 10px;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 7pt; line-height: 1.45;
+      margin: 3px 0;
+      white-space: pre-wrap;
+      color: #e4e4ec;
+    }
+    .code-block .c  { color: #7a7a90; }
+    .code-block .k  { color: #b3a8ff; }
+    .code-block .s  { color: #6fd0aa; }
+
+    /* ── File map ── */
+    .filemap {
+      background: #f7f7f9; border: 1px solid #e3e3e8;
+      border-radius: 4px; padding: 6px 11px; margin: 3px 0;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 7.5pt; line-height: 1.5; color: #555;
+      white-space: pre;
+    }
+    .filemap .root { color: #1a1a1a; font-weight: 700; }
+    .filemap .req  { color: #6a5af0; }
+
+    /* ── Litmus / sentence box ── */
+    .litmus {
+      background: #fafafa; border: 1px solid #e4e4e4;
+      border-radius: 4px;
+      padding: 7px 11px; margin: 4px 0;
+    }
+    .lit-row { display: flex; gap: 10px; align-items: flex-start; }
+    .lit-row + .lit-row { margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e0e0e0; }
+    .lit-tag {
+      font-size: 6.5pt; font-weight: 700; letter-spacing: 0.05em;
+      background: #e3e3e6; color: #666; border-radius: 2px;
+      padding: 3px 0; flex-shrink: 0; width: 58px; text-align: center;
+      margin-top: 1px;
+    }
+    .lit-tag.good { background: #1a9960; color: #fff; }
+    .q  { font-style: italic; color: #777; font-weight: 500; font-size: 8.5pt; line-height: 1.5; }
+    .qf { font-style: italic; color: #0d6b40; font-weight: 600; font-size: 8.5pt; line-height: 1.5; }
+
+    /* ── Definitions ── */
+    .defs { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .defs li {
+      font-size: 9pt; line-height: 1.45; color: #2a2a2a;
+      padding-left: 66px; position: relative; min-height: 18px;
+    }
+    .defs .term {
+      position: absolute; left: 0; top: 0;
+      font-size: 7pt; font-weight: 700; color: #fff;
+      border-radius: 3px; padding: 4px 0; width: 56px; text-align: center;
+      letter-spacing: 0.03em;
+    }
+    .term.t-skill { background: #1a9960; }
+    .term.t-agent { background: #6a5af0; }
+    .term.t-hook  { background: #d08020; }
+    .term.t-mcp   { background: #1f9aa0; }
+
+    /* ── Run command box ── */
+    .runcmd {
+      background: #f3fbf7; border: 1px solid #9bd6ba;
+      border-left: 2.5px solid #1a9960;
+      border-radius: 0 3px 3px 0;
+      padding: 6px 10px; margin-top: 5px;
+      font-size: 8.5pt; line-height: 1.5; color: #1a1a1a;
+    }
+    .runcmd b { color: #0d6b40; font-weight: 700; }
+    .runcmd code { background: #fff; border-color: #cfe8da; }
+
+    /* ── Callout (stranger test) ── */
+    .callout {
+      background: #1c1c22; border-radius: 4px;
+      padding: 7px 11px; margin: 4px 0;
+      font-size: 9pt; font-weight: 600; color: #fff; line-height: 1.5;
+    }
+
+    /* ── Checklist ── */
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .checklist li { display: flex; gap: 9px; align-items: flex-start;
+      font-size: 8.5pt; line-height: 1.45; color: #2a2a2a; }
+    .check {
+      width: 12px; height: 12px;
+      border: 1.5px solid #1a9960; border-radius: 2px;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ── Footer ── */
+    .doc-footer {
+      flex-shrink: 0; margin-top: 8px; padding-top: 6px;
+      border-top: 1px solid #e8e8e8;
+      font-size: 7pt; color: #777; line-height: 1.4;
+      display: flex; justify-content: space-between; align-items: baseline;
+    }
+    .doc-footer .repo { color: #6a5af0; font-weight: 600; white-space: nowrap; }
+
+    @media print {
+      body { background: #fff; }
+      .page { margin: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="doc-header">
+    <div class="doc-title">
+      <span>Building a Claude Code Plugin</span>
+      <span class="meta">BEEF CO · PLATFORM ENGINEERING</span>
+    </div>
+  </div>
+
+  <div class="intro">
+    A plugin is a folder of files that teaches Claude Code a workflow your team repeats.
+    A great plugin isn't just a pile of skills. The useful ones turn skills, agents, and hooks into a repeatable workflow.
+    You've seen <strong>adoption-os</strong> find the patterns in how your team uses Claude Code. Here's how to build one for a workflow of your own.
+  </div>
+
+  <div class="pattern-line">
+    <span class="pl-tag">adoption-os pattern</span>
+    <span class="pl-flow"><b>Hook</b> observes <span class="ar">→</span> <b>Agent</b> analyzes <span class="ar">→</span> <b>Skill</b> produces the file/output <span class="ar">→</span> <b>README</b> proves it works</span>
+  </div>
+
+  <div class="columns">
+
+    <!-- ── LEFT ── -->
+    <div>
+
+      <section>
+        <h2><span class="n">1</span>Start with one repeated task</h2>
+        <p>Do not build a general productivity plugin. Build one plugin for one painful, repeated workflow.</p>
+      </section>
+
+      <section>
+        <h2><span class="n">2</span>Know the four building blocks</h2>
+        <p class="micro" style="margin-bottom:6px;">A plugin is assembled from four kinds of part:</p>
+        <ul class="defs">
+          <li><span class="term t-skill">SKILL</span>The command and output template.</li>
+          <li><span class="term t-agent">AGENT</span>Looks through messy inputs to do work a person now does by hand.</li>
+          <li><span class="term t-hook">HOOK</span>Something that runs automatically when Claude does something.</li>
+          <li><span class="term t-mcp">MCP</span>A connection to an external system like GitHub, Jira, Slack, or Datadog.</li>
+        </ul>
+        <p style="margin-top:6px;">Your first plugin needs just <span class="em">one</span>, usually a Skill. The loop at the top of the page is where mature plugins end up, not where you start.</p>
+      </section>
+
+      <section>
+        <h2><span class="n">3</span>Write the plugin sentence</h2>
+        <p>Be concrete about who it's for, what it does, and what it replaces. Then fill in this template:</p>
+        <div class="litmus">
+          <div class="lit-row">
+            <span class="lit-tag">TEMPLATE</span>
+            <span class="q">"This plugin helps [who] [do a task] using [inputs] so they can [outcome] without [today's workaround]."</span>
+          </div>
+          <div class="lit-row">
+            <span class="lit-tag good">GOOD</span>
+            <span class="qf">"This plugin helps a platform engineer scaffold a new microservice using Beef Co engineering conventions so they can create the standard service files without copying from old repos or asking another team how it's done."</span>
+          </div>
+        </div>
+        <p>This is <span class="em">90% of the work</span>. Be specific, and give examples.</p>
+      </section>
+
+    </div>
+
+    <div class="col-rule"></div>
+
+    <!-- ── RIGHT ── -->
+    <div>
+
+      <section>
+        <h2><span class="n">4</span>Build the smallest version</h2>
+        <p>Three files is a working plugin. Start with exactly this structure:</p>
+        <div class="filemap"><span class="root">scaffold-kit/</span>
+  .claude-plugin/<span class="req">plugin.json</span>
+  skills/new-service/<span class="req">SKILL.md</span>
+  <span class="req">README.md</span></div>
+        <p class="micro" style="margin:5px 0 1px;">The manifest names the plugin. Claude Code discovers the skill from <code>/skills/new-service/SKILL.md</code>:</p>
+        <div class="code-block"><span class="c"># .claude-plugin/plugin.json</span>
+{
+  <span class="k">"name"</span>: "scaffold-kit",
+  <span class="k">"description"</span>: "Scaffold a new service using Beef Co engineering conventions.",
+  <span class="k">"version"</span>: "0.1.0"
+}</div>
+        <p class="micro" style="margin:5px 0 1px;">The SKILL.md is the prompt. <code>$ARGUMENTS</code> is what the user types after the command:</p>
+        <div class="code-block"><span class="c"># skills/new-service/SKILL.md</span>
+---
+<span class="k">description:</span> Scaffold a microservice to Beef Co spec.
+---
+Create a new service named "<span class="s">$ARGUMENTS</span>".
+Generate the 5 standard files:
+<span class="s">ci.yml · Dockerfile · health.ts · README · CODEOWNERS</span>
+Follow every Beef Co convention. Spell out each assumption before writing files.</div>
+        <div class="runcmd"><b>Run it:</b> load with <code>claude --plugin-dir ./scaffold-kit</code>, then type <code>/scaffold-kit:new-service payments-api</code>. Claude writes all five files to spec.</div>
+      </section>
+
+      <section>
+        <h2><span class="n">5</span>Test it like a stranger</h2>
+        <div class="callout">Fresh clone. If it fails, the plugin is not done.</div>
+        <ul class="checklist">
+          <li><span class="check"></span><span><code>claude plugin validate ./scaffold-kit</code> passes clean</span></li>
+          <li><span class="check"></span><span>The skill runs from <code>/scaffold-kit:new-service</code> and produces the files</span></li>
+          <li><span class="check"></span><span>They install from your README alone, with no help from you</span></li>
+        </ul>
+      </section>
+
+      <section>
+        <h2><span class="n">6</span>Only then add hooks or MCP</h2>
+        <p>Beginners overbuild. Do not add MCP because it sounds impressive: add it only when pasted-in data is the real bottleneck. Add a hook only when something genuinely must happen automatically. A working one-skill plugin beats an impressive broken one.</p>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    <span class="repo">github.com/dreafunnn/Adoption-OS</span>
+    <span></span>
+  </div>
+
+</div>
+</body>
+</html>

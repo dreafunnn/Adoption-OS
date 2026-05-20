@@ -28,7 +28,7 @@ write-exec-readout skill drafts your monthly CIO update — with real numbers
 Requires [Claude Code](https://claude.ai/code) and `jq` (`brew install jq` on Mac, `apt install jq` on Linux).
 
 ```bash
-git clone https://github.com/dreafundd/Adoption-OS
+git clone https://github.com/dreafunnn/Adoption-OS
 cd Adoption-OS
 chmod +x hooks/logger.sh   # required on every fresh clone
 ```
@@ -44,10 +44,10 @@ claude plugin validate .
 
 ## Try it in 5 minutes
 
-The repo ships with sample session logs in `tests/mock-sessions/` covering six engineers across two weeks. Run the harvester against them:
+The repo ships with sample session logs in `tests/beefco-sessions/` — five engineers at a fictional Fortune 500 ("Beef Co") across two weeks, with realistic `.jsonl` session transcripts and a usage CSV. Run the harvester against them:
 
 ```bash
-claude --plugin-dir ./ -p "Run the pattern-harvester agent on ./tests/mock-sessions"
+claude --plugin-dir ./ -p "Run the pattern-harvester agent on ./tests/beefco-sessions"
 ```
 
 You get three things back: a ranked list of workflows worth standardizing, intervention signals for where engineers are stuck and why, and a short list of anti-patterns to address.
@@ -68,7 +68,7 @@ claude --plugin-dir ./ -p "/adoption-os:write-exec-readout [paste findings here]
 
 Output is a five-section exec update — TL;DR, what changed, what's working, what's blocked, and what you need from leadership.
 
-For a full end-to-end demo with pre-seeded session data across 6 engineers and 2 teams:
+For a full end-to-end demo with pre-seeded session data across 5 Beef Co engineers and 5 teams:
 
 ```bash
 bash demo/demo.sh
@@ -129,6 +129,10 @@ adoption-os/
 ├── hooks/hooks.json                 # PostToolUse hook config
 ├── hooks/logger.sh                  # session logger
 ├── demo/demo.sh                     # end-to-end demo with pre-seeded data
-├── tests/mock-sessions/             # sample session logs and usage CSV
-└── BUILD_YOUR_OWN.md                # guide for building your own plugin
+├── demo/pitch.html                  # 5-minute demo pitch page
+├── tests/beefco-sessions/           # Beef Co Fortune 500 mock data (.jsonl + CSV)
+├── tests/mock-sessions/             # simpler generic mock data (.md + CSV)
+├── BUILD_YOUR_OWN.md                # long-form guide for building your own plugin
+└── BUILD_YOUR_OWN_PLUGIN.html       # one-page field guide (open in browser, or
+                                     #   convert to Word with `textutil -convert docx`)
 ```

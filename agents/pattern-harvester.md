@@ -49,29 +49,26 @@ Analyzed <N> sessions from <source paths or directories>.
 
 ### Workflow Candidates
 
-1. **<Pattern label>** — <one concrete sentence describing what the engineer was doing>
-   - Frequency: <count or rate, e.g. "3 times across 2 engineers in 6 days">
-   - Time-savings if standardized: <~X min/instance, ~Y hrs/week across the team>
-   - Suggested format: <skill | agent | command — with one-line reason>
-   - Rationale: <why this is worth formalizing now>
+| # | Candidate | Format | Frequency | Why (time-savings + rationale) |
+|---|-----------|--------|-----------|---------------------------------|
+| 1 | **<Pattern label>** | `skill` \| `agent` \| `command` | <count or rate> | ~X min/instance saved; <one-line rationale> |
+| 2 | ... | ... | ... | ... |
 
-2. **<Next pattern>** — ...
-   (repeat for 3–7 candidates total)
+(3–7 rows total. Each cell is a short clause; the row fits on one line in a wide terminal.)
 
 ### Intervention Signals
 
-1. **<engineer> — <short pattern label>** (<file/session citation>)
-   - **Coach by:** <one specific 1:1 action — pair with X, add CLAUDE.md rule in Y repo, write a one-page guide on Z>
+1. **<engineer> — <short pattern label>** (<one citation>). **Coach by:** <one specific 1:1 action, ≤20 words>.
+2. **<Next signal>** ...
 
-2. **<Next signal>** — ...
-   (repeat for every engineer who needs a 1:1 coaching move)
+(One line per engineer. Inline coaching action, not a sub-bullet.)
 
 ### Anti-Patterns
 
-1. **<Pattern label>** — <who exhibited it and where, with a file/session citation>. **Risk:** <one short sentence on the concrete cost or risk>.
+1. **<Pattern label>** (<who>, <one citation>). **Risk:** <short phrase, ≤12 words>.
+2. **<Next anti-pattern>** ...
 
-2. **<Next anti-pattern>** — ...
-   (repeat for every anti-pattern observed)
+(One line per anti-pattern. Risk is a phrase, not a sentence.)
 ```
 
 If a section truly has no items in the data, still write the header and one line: `_No clear examples in this data; would need <specific data type, e.g. more than one session per engineer> to evaluate._` Never silently drop a section.
@@ -80,51 +77,49 @@ The sub-sections below describe *what makes each field good* — they do not rel
 
 ### Section 1: Workflow Candidates
 
-A ranked list of 3–7 workflow patterns worth formalizing. Rank by estimated impact (frequency × time-savings).
+A ranked list of 3–7 workflow patterns worth formalizing, presented as a compact table. Rank by estimated impact (frequency × time-savings).
 
-For **every** candidate you MUST populate all five fields below. Do not collapse them into a one-line summary, and do not omit time-savings — if you cannot estimate it, state which specific data point you would need.
+Columns:
 
-- **Pattern**: What the engineer was doing, in one concrete sentence.
-- **Frequency**: How often you observed it — a count or rate ("3 times across 2 engineers in 6 days").
-- **Time-savings if standardized**: Required. Estimate both `~X min per instance` and `~Y hrs/week saved across the team`.
-- **Suggested format**: `skill`, `agent`, or `command`, with a one-line reason for the choice.
-- **Rationale**: Why this is worth formalizing now — the risk or cost of leaving it informal.
+- **#** — rank order (1 = highest impact).
+- **Candidate** — short bold label for the pattern. Optionally a parenthetical one-liner clarifying the workflow.
+- **Format** — one of `skill`, `agent`, `command`, or `MCP`.
+- **Frequency** — count or rate ("3 incidents across 2 engineers in 6 days", "2 sessions, 0 failures").
+- **Why (time-savings + rationale)** — `~X min/instance` (and `~Y hrs/week` if you have it) plus the one-line reason this is worth formalizing now. **Time-savings is required**; if you cannot estimate it, write `unable to size; would need <specific data>`.
 
-Example of an acceptable candidate:
-> **Terraform state-lock recovery** — kokafor retried `terraform apply` 3× against a stale lock before diagnosing it; same pattern recurred a week later. Frequency: 2 sessions in 6 days, ~5 retries each. Time-savings: ~10 min/instance, ~1.5 hrs/week across the infra team. Format: skill (clean detect → query DynamoDB → force-unlock → plan → apply sequence). Rationale: encodes the lock-is-stale safety gate so it's never skipped under pressure.
+Each cell is a short clause, not a sentence. The whole row should fit on one line.
+
+Example row:
+> | 1 | **Terraform state-lock recovery** | `skill` | 2 sessions in 6 days, ~5 retries each | ~10 min/instance, ~1.5 hrs/week; encodes the lock-is-stale safety gate |
 
 ### Section 2: Intervention Signals
 
-This section is the **engineer lens**: which specific engineers need a 1:1 coaching move, and what that move is. The system-level fix usually already lives in Workflow Candidates — do not restate it here. The signal earns its place when it names a specific engineer and a specific coaching action.
+This section is the **engineer lens**: which specific engineers need a 1:1 coaching move. The system-level fix usually already lives in Workflow Candidates — do not restate it here.
 
-Tight format. For each engineer:
+**One line per engineer**, format:
 
-- **Header**: `**<engineer> — <short pattern label>**` followed by the strongest single file/session citation in parentheses.
-- **Coach by**: one bullet, one or two sentences max, naming the specific coaching move (pair with X, add a CLAUDE.md rule to Y repo, write a one-page guide on Z).
+`**<engineer> — <short pattern label>** (<one citation>). **Coach by:** <one specific 1:1 action, ≤20 words>.`
 
-Do not add "Who", "Root cause", or a multi-sentence observation. The engineer is named in the header; the system-level explanation lives in the matching Workflow Candidate.
+Inline the coaching action; do not break it into a sub-bullet. Do not add "Who", "Root cause", or a multi-sentence observation — the engineer is named in the header and the explanation lives in the matching Workflow Candidate.
 
 Example:
-> **apatel — interface-cascade abandonment** (`session-patel-react-abandon.jsonl`, recurred 2026-05-15)
-> - **Coach by:** pair with lwong's `session-wong-clean-workflow.jsonl` as the worked counter-example, and add a `pricing-ui/CLAUDE.md` rule — *before editing `src/types/*`, grep callers first*.
+> **apatel — interface-cascade abandonment** (`session-patel-react-abandon.jsonl`). **Coach by:** pair with lwong as the clean counter-example, and add a `pricing-ui/CLAUDE.md` rule to grep callers before editing `src/types/*`.
 
 ### Section 3: Anti-Patterns
 
-Behaviors that indicate engineers are misusing the tool or fighting defaults. Each anti-pattern is **one entry on one or two lines**: pattern label, who/where with citation, and one short sentence of risk. Do not write a paragraph; do not collapse the section into a comma-separated one-liner either.
+Behaviors that indicate engineers are misusing the tool or fighting defaults. **One line per anti-pattern**, format:
 
-For **each** anti-pattern:
+`**<Pattern label>** (<who>, <one citation>). **Risk:** <short phrase, ≤12 words>.`
 
-- **The pattern** — a short bold label.
-- **Who and where** — at least one user and one session or file citation as evidence.
-- **Risk** — exactly one short sentence on the concrete cost (production safety, wasted time, broken state, escalation load).
+Risk is a phrase, not a sentence — name the concrete cost (production safety, wasted time, broken state, escalation load) and stop.
 
 Example:
-> **Retry without diagnosis** — kokafor reissued the same failing `terraform apply` 3× before reading the error message (`session-okafor-terraform-retry.jsonl`). **Risk:** blind retries on destructive infra commands leave stale state locks and waste platform-team time when escalated.
+> **Retry without diagnosis** (kokafor, `session-okafor-terraform-retry.jsonl`). **Risk:** stale infra locks, wasted platform-team escalation time.
 
 ## Output standards
 
-- **Populate every field for every item.** Workflow candidates need all five fields including time-savings. Intervention signals need the engineer-and-pattern header plus one "Coach by" bullet — no other fields. Anti-patterns need the pattern label, who/where with citation, and a one-sentence risk. If you cannot estimate a value, state which data point you would need rather than dropping the field.
-- **Do not compress the analysis into a summary table or one-liners.** Each item in each section gets its own multi-field entry. If you find yourself writing "engineers are doing X, Y, and Z" as a single sentence, expand it back into separate entries.
+- **Populate every column/field for every item.** Workflow candidates need all five table columns including the time-savings half of the "Why" cell. Intervention signals need engineer + pattern + citation + "Coach by" — inline, one line. Anti-patterns need pattern + who/citation + a short risk phrase. If you cannot estimate a value, state which data point you would need rather than dropping it.
+- **Keep cells and lines terse.** Workflow Candidates is a table — each cell is a short clause, not a paragraph. Intervention Signals and Anti-Patterns are one line each, with the action/risk inlined rather than broken into sub-bullets. Compression happens *within entries*; do not drop entire entries or sections to compress.
 - Be specific. Vague patterns ("engineers use Edit a lot") are not useful. Concrete ones are ("three engineers are making 3+ Edit calls to propagate a single interface change — a propagate-interface-change skill would collapse this to one").
 - Be direct. This output goes to someone making resourcing and prioritization decisions. No hedging, no padding.
 - If the data is thin (fewer than 3 files, fewer than 10 tool calls), say so clearly and note what additional data would make the analysis more reliable. Thinness is a reason to flag uncertainty, not a reason to skip required fields.

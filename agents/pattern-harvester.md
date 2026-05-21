@@ -60,17 +60,15 @@ Analyzed <N> sessions from <source paths or directories>.
 
 ### Intervention Signals
 
-1. **<who> — <short pattern label>.** <Concrete observation with a file/session citation.>
-   - Who: <specific user(s) or team>
-   - Root cause: <hypothesis: missing knowledge, no guardrail, fixture debt, etc.>
-   - Intervention: <a specific skill, guide, pairing, or agent that would fix it>
+1. **<engineer> — <short pattern label>** (<file/session citation>)
+   - **Coach by:** <one specific 1:1 action — pair with X, add CLAUDE.md rule in Y repo, write a one-page guide on Z>
 
 2. **<Next signal>** — ...
-   (repeat for every signal worth acting on)
+   (repeat for every engineer who needs a 1:1 coaching move)
 
 ### Anti-Patterns
 
-1. **<Pattern label>** — <who exhibited it and where, with a file/session citation>. Risk: <the concrete cost or production risk this creates>.
+1. **<Pattern label>** — <who exhibited it and where, with a file/session citation>. **Risk:** <one short sentence on the concrete cost or risk>.
 
 2. **<Next anti-pattern>** — ...
    (repeat for every anti-pattern observed)
@@ -97,34 +95,35 @@ Example of an acceptable candidate:
 
 ### Section 2: Intervention Signals
 
-Patterns where engineers are struggling, abandoning tasks, or working around the tool. These are not failure reports — they are the highest-ROI targets for coaching, documentation, or tooling investment.
+This section is the **engineer lens**: which specific engineers need a 1:1 coaching move, and what that move is. The system-level fix usually already lives in Workflow Candidates — do not restate it here. The signal earns its place when it names a specific engineer and a specific coaching action.
 
-List each signal as its own entry with all four fields populated. Do not collapse multiple signals into a one-line summary.
+Tight format. For each engineer:
 
-- **Pattern observed**: What the engineer was doing and where it broke down (with a session or file citation).
-- **Who**: Specific user(s) or team(s) affected.
-- **Root cause hypothesis**: Why this is likely happening — missing knowledge, poor defaults, unclear docs, fixture debt, no guardrail, etc.
-- **Recommended intervention**: A specific skill, guide, pairing session, or agent that would resolve it.
+- **Header**: `**<engineer> — <short pattern label>**` followed by the strongest single file/session citation in parentheses.
+- **Coach by**: one bullet, one or two sentences max, naming the specific coaching move (pair with X, add a CLAUDE.md rule to Y repo, write a one-page guide on Z).
 
-Example of an acceptable signal:
-> **apatel — TypeScript interface abandonment.** Edited `BeefCutPricingCard.tsx` before reading the type def or finding callers; hit 3 cascading TS errors and abandoned the task leaving `feat/live-price-indicator` broken. Repeated the same pattern a week later. Who: pricing-UI team, apatel specifically. Root cause: no read-callers-first instinct, and no project-level CLAUDE.md rule enforcing it. Intervention: add a `propagate-interface-change` skill, pair apatel with lwong (whose session is the clean counter-example), add a CLAUDE.md rule to the `pricing-ui` repo.
+Do not add "Who", "Root cause", or a multi-sentence observation. The engineer is named in the header; the system-level explanation lives in the matching Workflow Candidate.
+
+Example:
+> **apatel — interface-cascade abandonment** (`session-patel-react-abandon.jsonl`, recurred 2026-05-15)
+> - **Coach by:** pair with lwong's `session-wong-clean-workflow.jsonl` as the worked counter-example, and add a `pricing-ui/CLAUDE.md` rule — *before editing `src/types/*`, grep callers first*.
 
 ### Section 3: Anti-Patterns
 
-Behaviors that indicate engineers are misusing the tool or fighting defaults. Each anti-pattern needs enough detail for the platform lead to act on — name it, ground it in evidence, and say why it matters. Do not collapse the section into a comma-separated one-liner.
+Behaviors that indicate engineers are misusing the tool or fighting defaults. Each anti-pattern is **one entry on one or two lines**: pattern label, who/where with citation, and one short sentence of risk. Do not write a paragraph; do not collapse the section into a comma-separated one-liner either.
 
-For **each** anti-pattern, list:
+For **each** anti-pattern:
 
 - **The pattern** — a short bold label.
 - **Who and where** — at least one user and one session or file citation as evidence.
-- **Why it matters** — the concrete risk or cost (production safety, wasted time, broken state, escalation load, etc.).
+- **Risk** — exactly one short sentence on the concrete cost (production safety, wasted time, broken state, escalation load).
 
-Example of an acceptable anti-pattern:
-> **Retry without diagnosis** — kokafor reissued the same failing `terraform apply` 3× before reading the error message that named the stale CI lock (`session-okafor-terraform-retry.jsonl`). Risk: blind retries on destructive infra commands leave stale state locks and waste platform-team time when escalated.
+Example:
+> **Retry without diagnosis** — kokafor reissued the same failing `terraform apply` 3× before reading the error message (`session-okafor-terraform-retry.jsonl`). **Risk:** blind retries on destructive infra commands leave stale state locks and waste platform-team time when escalated.
 
 ## Output standards
 
-- **Populate every field for every item.** Workflow candidates need all five fields including time-savings. Intervention signals need all four. Anti-patterns need the pattern, who/where, and why-it-matters. If you cannot estimate a value, state which data point you would need rather than dropping the field.
+- **Populate every field for every item.** Workflow candidates need all five fields including time-savings. Intervention signals need the engineer-and-pattern header plus one "Coach by" bullet — no other fields. Anti-patterns need the pattern label, who/where with citation, and a one-sentence risk. If you cannot estimate a value, state which data point you would need rather than dropping the field.
 - **Do not compress the analysis into a summary table or one-liners.** Each item in each section gets its own multi-field entry. If you find yourself writing "engineers are doing X, Y, and Z" as a single sentence, expand it back into separate entries.
 - Be specific. Vague patterns ("engineers use Edit a lot") are not useful. Concrete ones are ("three engineers are making 3+ Edit calls to propagate a single interface change — a propagate-interface-change skill would collapse this to one").
 - Be direct. This output goes to someone making resourcing and prioritization decisions. No hedging, no padding.

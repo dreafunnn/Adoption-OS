@@ -127,23 +127,16 @@ fire_hook Edit  file_path 'src/components/pricing/PricingDashboard.tsx'         
 fire_hook Edit  file_path 'src/components/pricing/PricingTable.tsx'                  true
 fire_hook Bash  command 'npm test -- --testPathPattern=pricing'                      true
 
-# CSV schema: timestamp,user,tool,target,success
-total=$(tail -n +2 "$CSV_FILE" | wc -l | tr -d ' ')
-successes=$(tail -n +2 "$CSV_FILE" | awk -F',' '$NF=="true"' | wc -l | tr -d ' ')
-failures=$(( total - successes ))
-success_pct=$(( successes * 100 / total ))
-
-# Per-tool breakdown from column 3
-top_tool="$(tail -n +2 "$CSV_FILE" \
-  | awk -F',' '{print $3}' \
-  | sort | uniq -c | sort -rn \
-  | head -1 | awk '{print $2}')"
-
-# Failure rate by tool — most failure-prone tool
-worst_tool="$(tail -n +2 "$CSV_FILE" \
-  | awk -F',' '{tool[$3]++; if($NF=="false") fail[$3]++}
-               END{for(t in tool) printf "%s %.2f\n", t, fail[t]/tool[t]}' \
-  | sort -k2 -rn | head -1 | awk '{print $1}')"
+# Compute summary stats via the shared helper so the demo and the
+# write-exec-readout skill present the same numbers. --shell mode emits
+# safe KEY='value' lines we can source directly.
+eval "$(bash "$PLUGIN_DIR/scripts/stats.sh" --shell "$CSV_FILE")"
+total="$TOTAL"
+successes="$SUCCESSES"
+failures="$FAILURES"
+success_pct="$SUCCESS_PCT"
+top_tool="$TOP_TOOL"
+worst_tool="$WORST_TOOL"
 
 printf "\n  Beefco CSV seeded: %d rows | %d successes | %d failures | %d%% success rate\n" \
   "$total" "$successes" "$failures" "$success_pct"

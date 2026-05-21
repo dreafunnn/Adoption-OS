@@ -9,7 +9,7 @@ You are writing a monthly adoption readout for the Head of Platform Engineering 
 Two modes, depending on how you were invoked:
 
 - **Interactive Claude Code session.** `${CLAUDE_PLUGIN_DATA}` is set by the runtime, and `${CLAUDE_PLUGIN_DATA}/adoption-os.csv` is readable. Read it and derive: total tool calls, overall success rate, most active users, most commonly used tools. Use one or two of these as the quantified proof point in "What's working."
-- **Non-interactive (`claude -p`, scripted, or piped).** `${CLAUDE_PLUGIN_DATA}` is not set in this mode and the CSV lives outside the sandboxed working directory, so you cannot read it directly. Stats must be provided by the caller as part of `$ARGUMENTS` — typically computed beforehand by piping the CSV through a helper script.
+- **Non-interactive (`claude -p`, scripted, or piped).** `${CLAUDE_PLUGIN_DATA}` is not set in this mode and the CSV lives outside the sandboxed working directory, so you cannot read it directly. Stats must be provided by the caller as part of `$ARGUMENTS` — the plugin ships `scripts/stats.sh` for this; the caller runs `bash scripts/stats.sh` and pastes the output into the prompt.
 
 If `$ARGUMENTS` already contains a "VERIFIED LIVE STATS" or similar pre-computed numbers block, use those numbers directly. Do not attempt to re-read the CSV in that case — the caller did it for you.
 

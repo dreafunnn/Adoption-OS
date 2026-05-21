@@ -144,6 +144,7 @@ adoption-os/
 ├── hooks/logger.sh                  # session logger
 ├── demo/demo.sh                     # end-to-end demo with pre-seeded data
 ├── demo/pitch.html                  # 5-minute demo pitch page
+├── scripts/stats.sh                 # compute summary stats from the usage CSV
 ├── tests/beefco-sessions/           # Beef Co Fortune 500 mock data (.jsonl + CSV)
 ├── tests/mock-sessions/             # simpler generic mock data (.md + CSV)
 ├── build_your_own_claude_code_plugin.md   # long-form guide for building your own plugin

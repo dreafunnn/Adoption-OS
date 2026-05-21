@@ -7,8 +7,15 @@
 set -euo pipefail
 
 PLUGIN_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CSV_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/plugins/data/adoption-os}"
+
+# Demo isolation: write to a fresh temp dir so we never touch the user's
+# real adoption-os telemetry at ~/.claude/plugins/data/adoption-os/.
+# Export CLAUDE_PLUGIN_DATA so the logger (called by fire_hook below)
+# writes here too, not to its default real path.
+CSV_DIR="$(mktemp -d -t adoption-os-demo.XXXX)"
 CSV_FILE="$CSV_DIR/adoption-os.csv"
+export CLAUDE_PLUGIN_DATA="$CSV_DIR"
+
 SESSIONS_DIR="$PLUGIN_DIR/tests/beefco-sessions"
 
 # ─────────────────────────────────────────────
@@ -199,4 +206,4 @@ VERIFIED LIVE STATS FROM SESSION LOG (do not attempt to re-read the CSV — use 
 
 divider
 printf "  Demo complete.\n"
-printf "  CSV at: %s\n\n" "$CSV_FILE"
+printf "  Isolated demo CSV (your real telemetry was not touched): %s\n\n" "$CSV_FILE"

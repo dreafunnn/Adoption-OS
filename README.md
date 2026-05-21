@@ -92,7 +92,7 @@ watch -n1 "tail -5 ~/.claude/plugins/data/adoption-os/adoption-os.csv"
 
 **Agent — `pattern-harvester`**
 
-Takes a directory path as its argument. Reads session logs and usage CSVs, finds recurring patterns across engineers, and returns ranked workflow candidates with estimated time-savings, a set of intervention signals showing where teams are struggling, and a list of anti-patterns. It has no write access (`disallowedTools: [Write, Edit]`) and will cite the specific file or row behind every finding.
+Takes a directory path as its argument. Reads session logs and usage CSVs, finds recurring patterns across engineers, and returns ranked workflow candidates with estimated time-savings, a set of intervention signals showing where teams are struggling, and a list of anti-patterns. It cannot write, edit, or run shell commands (`disallowedTools: [Write, Edit, Bash]`) and will cite the specific file or row behind every finding.
 
 Point it at a designated log export directory — not a live project directory. It reads everything it finds.
 
@@ -110,11 +110,25 @@ If you pass stale or estimated numbers, the skill will flag the discrepancy and 
 
 ---
 
+## What gets logged
+
+Every matched tool call (`Read`, `Glob`, `Grep`, `Edit`, `Write`, `Bash`) lands as one row in `~/.claude/plugins/data/adoption-os/adoption-os.csv`. A row looks like:
+
+| `timestamp` | `user` | `tool` | `target` | `success` |
+
+`target` is the file path (for `Read`/`Edit`/`Write`), the search pattern (for `Glob`/`Grep`), or the shell command (for `Bash`). Before writing, the logger:
+
+- **Redacts** common secret patterns — OpenAI-style keys, GitHub tokens, AWS access keys, Bearer tokens, JWTs, Slack tokens — and replaces each match with a labelled placeholder like `<redacted:bearer-token>`.
+- **Truncates** any target longer than 200 characters so a single rogue paste cannot blow up a CSV row.
+- **Sanitizes** values starting with `=`, `+`, `-`, or `@` so they cannot execute as spreadsheet formulas when the CSV is opened in Excel or Sheets.
+
+Redaction is best-effort, not bulletproof. Before deploying across a large team, review a sample of the CSV to understand what your team's tool calls actually look like. If engineers routinely paste secrets directly into shell commands, address that upstream — do not rely on the redactor to catch every shape.
+
 ## Security
 
 Session data is written to `~/.claude/plugins/data/adoption-os/` — not your project directory. It will never appear in `git status` or get committed accidentally.
 
-The hook validates the JSON payload before processing and sanitizes extracted values against both shell injection and CSV formula injection. `pattern-harvester` cannot write or edit files. The skill treats CSV values as data only and will not interpret cell contents as instructions.
+The hook validates the JSON payload before processing, sanitizes extracted values against shell injection and CSV formula injection, redacts common secret patterns, and truncates long values (see "What gets logged" above). `pattern-harvester` cannot write, edit, or run shell commands (`disallowedTools: [Write, Edit, Bash]`). The skill treats CSV values as data only and will not interpret cell contents as instructions.
 
 ---
 

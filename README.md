@@ -33,12 +33,44 @@ cd Adoption-OS
 chmod +x hooks/logger.sh   # required on every fresh clone
 ```
 
-Validate the structure before loading:
+Validate the structure:
 
 ```bash
 claude plugin validate .
 # ✔ Validation passed
 ```
+
+---
+
+## Enable it
+
+**For one session** (kick the tires):
+
+```bash
+claude --plugin-dir .
+```
+
+`--plugin-dir` loads the plugin for that session only. Use this to try things before turning it on permanently.
+
+**For every session** (turn the telemetry on for real):
+
+Add a shell alias so every `claude` invocation auto-loads the plugin:
+
+```bash
+# From inside the Adoption-OS directory:
+echo "alias claude='claude --plugin-dir $(pwd)'" >> ~/.zshrc
+source ~/.zshrc
+```
+
+(Use `~/.bashrc` if you're on bash.) The hook now fires on every `Read`, `Glob`, `Grep`, `Edit`, `Write`, and `Bash` call across every session, and rows accumulate in `~/.claude/plugins/data/adoption-os/adoption-os.csv`.
+
+To confirm it's working, do anything in a new Claude Code session and then:
+
+```bash
+tail -5 ~/.claude/plugins/data/adoption-os/adoption-os.csv
+```
+
+You should see one new row per tool call.
 
 ---
 
@@ -80,7 +112,7 @@ bash demo/demo.sh
 
 **Hook — `hooks/logger.sh`**
 
-Fires on every `Edit`, `Write`, or `Bash` call via a `PostToolUse` hook. Appends a timestamped row to `~/.claude/plugins/data/adoption-os/adoption-os.csv` with columns: `timestamp`, `user`, `tool`, `target`, `success`. The `user` field is pulled from `$USER` automatically — no configuration needed. The CSV is the raw evidence layer; the longer it runs, the more useful the readout becomes.
+Fires on every `Read`, `Glob`, `Grep`, `Edit`, `Write`, or `Bash` call via a `PostToolUse` hook. Appends a timestamped row to `~/.claude/plugins/data/adoption-os/adoption-os.csv` with columns: `timestamp`, `user`, `tool`, `target`, `success`. The `user` field is pulled from `$USER` automatically — no configuration needed. The CSV is the raw evidence layer; the longer it runs, the more useful the readout becomes.
 
 > `CLAUDE_PLUGIN_DATA` is a runtime variable set by Claude Code, not your shell. The path above is the default location.
 
